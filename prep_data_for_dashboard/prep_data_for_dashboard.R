@@ -283,3 +283,59 @@ saveRDS(LP_filtered, file.path(output_folder, "lp_final.rds"))
 
 
 
+
+
+
+# Sample Line Plot for LP 
+
+library(tidyverse)
+library(scales)
+
+# Filter to one country
+df_country <- LP_filtered %>%
+  filter(countrycode == "AFG") %>%   # change country
+  arrange(release_year)
+
+# Plot
+p <- ggplot(df_country, aes(x = release_year)) +
+  
+  geom_line(aes(y = lp_all, color = "Learning Poverty"), linewidth = 1.3) +
+  geom_line(aes(y = ld_all, color = "Learning Deprivation"), linewidth = 1.3) +
+  geom_line(aes(y = sd_all, color = "Schooling Deprivation"), linewidth = 1.3) +
+  
+  geom_point(
+    aes(y = ld_all, shape = test),
+    size = 3.5,
+    stroke = 1,
+    color = "black"
+  ) +
+  
+  scale_color_manual(
+    values = c(
+      "Learning Poverty" = "#0072B2",
+      "Learning Deprivation" = "#D55E00",
+      "Schooling Deprivation" = "#009E73"
+    )
+  ) +
+  
+  scale_y_continuous(
+    labels = label_percent(scale = 1),
+    expand = expansion(mult = 0.1)   # <-- key change
+  ) +
+  
+  labs(
+    title = unique(df_country$country_name),
+    subtitle = "Learning Poverty and its Components Over Time",
+    x = "Release Year",
+    y = "Share of Children (%)",
+    shape = "Assessment",
+    color = ""
+  ) +
+  
+  theme_classic(base_size = 14) +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(face = "bold", size = 18)
+  )
+
+p
